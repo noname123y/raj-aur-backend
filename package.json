@@ -1,0 +1,16 @@
+{
+  "name": "raj-aur-backend",
+  "version": "1.0.0",
+  "description": "a backenf project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chai",
+    "javascript",
+    "backend"
+  ],
+  "author": "raj jaiswal",
+  "license": "ISC"
+}

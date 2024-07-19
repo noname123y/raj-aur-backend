@@ -24,7 +24,7 @@ const registerUser= asyncHandler(async(req,res)=>{
   throw new ApiError(400,"all feild is required")
  }
  // validating the user
-const existeduser=User.findOne({
+const existeduser=await User.findOne({
   $or:[{ username },{ email }]
 })
 
@@ -33,13 +33,17 @@ if(existeduser){
 }
 //extracting the local path of avatar and coverImage
 const avavtarLocalPath=req.files?.avatar[0]?.path
-const CoverImageLocalPath=req.files?.coverImage[0]?.path
 
+let CoverImageLocalPath;
+if(req.files && Array.isArray(req.files.coverImage)  && req.files.coverImage.length>0){
+  CoverImageLocalPath=req.files.coverImage[0].path;
+}
+//console.log(req.files)
 if(!avavtarLocalPath){
   throw new ApiError(400,"Avatar file is required")
-}
+};
 //upload on cloudinary
-const avatar=await uploadCloudinary(avavtarLocalPath)
+const avatar=await uploadCloudinary(avavtarLocalPath);
 const coverImage=await uploadCloudinary(CoverImageLocalPath)
 
 //check if avatar is uploaded or not

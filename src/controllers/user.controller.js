@@ -319,6 +319,87 @@ return res.status(200)
 
 })
 
+const getuserProfile=asyncHandler(async(req,res)=>{
+
+  const username=req.params
+
+  if(!username){
+    throw new ApiError(400,"username not found")
+
+  }
+
+ const user=await User.aggregate([
+  {
+    $match:{
+      username:username
+    }
+  },
+    {
+      $lookup:{
+        from:"subscriptions",
+        localField:_id,
+        foreignField:"channel",
+        as:"Subscribers"
+
+
+      }
+    },
+    {
+      $lookup:{
+        from:"subscriptions",
+        localField:_id,
+        foreignField:"subscriber",
+        as:"SubscribedTo"
+        }
+    },
+    {
+      $addFields:{
+        subscribersCount:{
+          $size:"$Subscribers"
+        },
+
+        channelSubscribedTocount:{
+          $size:"$SubscribedTo"
+           
+        },
+
+        isSubscribed:{
+          $cond:{
+            if:{$in:[req.user?._id,"$Subscribers.subscriber"]},
+            then:true,
+            else:false
+          }
+        }
+
+      }
+    },
+    {
+      $project:{
+        fullname:1,
+        username:1,
+        subscribersCount:1,
+        channelSubscribedTocount:1,
+        isSubscribed:1,
+        avatar:1,
+        coverImage:1,
+        email:1
+
+      }
+    }
+
+  ])
+  // aggrete pipeline returns an array
+
+  if(!user?.length){
+    throw new ApiError(400," user profile  not created")
+  }
+  return res
+  .status(200)
+  .json(new ApiResponse(200,user[0],"user profile created sucessfully"))
+
+
+
+})
 
 export {registerUser,loginUser,logOutuser,refreshaccessToken,changeCurrentPassword,getCurrentuser,Updateuserdetails,UpdateAvatar}
 
